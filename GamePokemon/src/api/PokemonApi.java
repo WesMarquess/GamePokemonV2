@@ -1,0 +1,50 @@
+package api;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+public class PokemonApi {
+
+    private static final String BASE_URL = "https://pokeapi.co/api/v2/";
+    private final HttpClient client;
+
+    public PokemonApi() {
+        this.client = HttpClient.newHttpClient();
+    }
+
+    public String get(String endpoint) throws Exception {
+        return getUrl(BASE_URL + endpoint);
+    }
+
+    public String getUrl(String urlCompleta) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(urlCompleta))
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            throw new RuntimeException("Erro na requisição.");
+        }
+        return response.body();
+    }
+
+    public String buscarPokemon(String nome) throws Exception {
+        return get("pokemon/" + nome);
+    }
+
+    public String buscarPokemonPorId(int id) throws Exception {
+        return get("pokemon/" + id);
+    }
+
+    public String buscarEvolucao(int id) throws Exception {
+        return get("evolution-chain/" + id);
+    }
+
+    public String buscarAtaque(String nomeAtaque) throws Exception {
+        return get("move/" + nomeAtaque);
+    }
+}
