@@ -1,6 +1,6 @@
 package model;
 
-import model.enums.Tipo;
+import enums.Tipo;
 
 public class Movimento {
     private String nome;

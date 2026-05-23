@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import model.Movimento;
 import model.Pokemon;
-import model.enums.Tipo;
+import enums.Tipo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,6 +96,7 @@ public class PokemonParser {
 
     private Tipo mapearTipo(String tipoApi) {
         return switch (tipoApi) {
+            case "normal" -> Tipo.NORMAL;
             case "fire" -> Tipo.FOGO;
             case "water" -> Tipo.AGUA;
             case "grass" -> Tipo.PLANTA;
@@ -104,9 +105,12 @@ public class PokemonParser {
             case "rock" -> Tipo.PEDRA;
             case "psychic" -> Tipo.PSIQUICO;
             case "ghost" -> Tipo.FANTASMA;
-            case "poison" -> Tipo.VENENOSO;
+            case "poison" -> Tipo.VENENO;
             case "bug" -> Tipo.INSETO;
             case "ice" -> Tipo.GELO;
+            case "fighting" -> Tipo.LUTADOR;
+            case "ground" -> Tipo.TERRA;
+            case "dragon" -> Tipo.DRAGAO;
             default -> Tipo.NORMAL;
         };
     }

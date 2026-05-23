@@ -1,6 +1,6 @@
 package model;
 
-import model.enums.Tipo;
+import enums.Tipo;
 
 import java.util.List;
 import java.util.ArrayList;

@@ -8,7 +8,7 @@ import com.google.gson.JsonParser;
 import connection.DatabaseConnection;
 import model.Movimento;
 import model.Pokemon;
-import model.enums.Tipo;
+import enums.Tipo;
 
 import java.sql.*;
 import java.util.*;
