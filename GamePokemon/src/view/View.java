@@ -1,15 +1,15 @@
 package view;
 
+import battle.Batalha;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 import model.Jogador;
 import model.Pokemon;
 import repository.JogadorRepository;
 import repository.PokemonRepository;
 import service.JogadorService;
-
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Scanner;
-import java.util.stream.Collectors;
 
 public class View {
 
@@ -61,6 +61,8 @@ public class View {
         List<Pokemon> opcoes = pokemonRepository.buscarAleatorios();
         Pokemon escolhido = exibirEscolhaPokemon(input, opcoes);
         jogador = cadastrarJogador(input, escolhido);
+        Pokemon adversario = escolherAdversarioTeste(escolhido, opcoes);
+        iniciarBatalhaTeste(adversario);
     }
 
     private void carregarJogo(Scanner input) {
@@ -128,6 +130,21 @@ public class View {
             }
         }
         return opcoes.get(escolha - 1);
+    }
+
+    private Pokemon escolherAdversarioTeste(Pokemon escolhido, List<Pokemon> opcoes) {
+        for (Pokemon pokemon : opcoes) {
+            if (!pokemon.equals(escolhido)) {
+                return pokemon;
+            }
+        }
+        return escolhido;
+    }
+
+    private void iniciarBatalhaTeste(Pokemon adversario) {
+        System.out.println("\nPreparando batalha de teste contra " + adversario.getNome() + "...");
+        Batalha batalha = new Batalha(jogador, adversario);
+        batalha.iniciarBatalha();
     }
 
     public void salvarProgresso() {
