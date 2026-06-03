@@ -1,6 +1,7 @@
 package battle;
 
 import enums.Tipo;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 import model.Jogador;
@@ -87,16 +88,22 @@ public class Batalha {
 
     // Menu de Movimentos
     private boolean menuAtaque(Pokemon atacante, Pokemon defensor) {
+        List<Movimento> movimentos = obterMovimentosLimitados(atacante);
+        if (movimentos.isEmpty()) {
+            System.out.println("\nNenhum movimento disponível. O ataque falhou!");
+            return false;
+        }
+
         System.out.println("\nEscolha um movimento:");
-        for (int i = 0; i < atacante.getMovimentos().size(); i++) {
-            Movimento mov = atacante.getMovimentos().get(i);
+        for (int i = 0; i < movimentos.size(); i++) {
+            Movimento mov = movimentos.get(i);
             System.out.println((i + 1) + ". " + mov.getNome() + " (PP: " + mov.getPpAtual() + ")");
         }
 
         int escolha = scanner.nextInt() - 1;
 
-        if (escolha >= 0 && escolha < atacante.getMovimentos().size()) {
-            Movimento movEscolhido = atacante.getMovimentos().get(escolha);
+        if (escolha >= 0 && escolha < movimentos.size()) {
+            Movimento movEscolhido = movimentos.get(escolha);
             realizarAtaque(atacante, defensor, movEscolhido);
         } else {
             System.out.println("Movimento inválido! Tropeçou e perdeu a vez.");
@@ -111,8 +118,13 @@ public class Batalha {
         
         System.out.println("\nTurno do adversário!");
         // Escolhe um ataque aleatório
-        int indexAleatorio = random.nextInt(atacante.getMovimentos().size());
-        Movimento movAdversario = atacante.getMovimentos().get(indexAleatorio);
+        List<Movimento> movimentos = obterMovimentosLimitados(atacante);
+        if (movimentos.isEmpty()) {
+            System.out.println("O adversário não tem movimentos disponíveis.");
+            return;
+        }
+        int indexAleatorio = random.nextInt(movimentos.size());
+        Movimento movAdversario = movimentos.get(indexAleatorio);
         realizarAtaque(atacante, defensor, movAdversario);
     }
 
@@ -175,6 +187,14 @@ public class Batalha {
     private int obterVelocidade(Pokemon pokemon) {
         Integer nivel = pokemon.getNivel();
         return 10 + (nivel != null ? nivel : 1);
+    }
+
+    private List<Movimento> obterMovimentosLimitados(Pokemon pokemon) {
+        List<Movimento> movimentos = pokemon.getMovimentos();
+        if (movimentos == null || movimentos.isEmpty()) {
+            return List.of();
+        }
+        return movimentos.size() <= 4 ? movimentos : movimentos.subList(0, 4);
     }
 
     // Fuga Simples
