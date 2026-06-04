@@ -1,9 +1,11 @@
 package battle;
 
 import enums.Tipo;
+
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
+
 import model.Jogador;
 import model.Movimento;
 import model.Pokemon;
@@ -14,26 +16,21 @@ public class Batalha {
     private Scanner scanner;
     private Random random;
 
-    public Batalha(Jogador jogador, Pokemon pokemonAdversario) {
-        if (jogador == null) {
-            throw new IllegalArgumentException("O jogador não pode ser nulo para iniciar uma batalha.");
-        }
-        if (pokemonAdversario == null) {
-            throw new IllegalArgumentException("O Pokémon adversário não pode ser nulo para iniciar uma batalha.");
-        }
+    public Batalha(Jogador jogador, Pokemon pokemonAdversario, Scanner scanner) {
+        if (jogador == null) throw new IllegalArgumentException("O jogador não pode ser nulo.");
+        if (pokemonAdversario == null) throw new IllegalArgumentException("O adversário não pode ser nulo.");
         this.jogador = jogador;
         this.pokemonAdversario = pokemonAdversario;
-        this.scanner = new Scanner(System.in);
+        this.scanner = scanner;
         this.random = new Random();
     }
 
     // O Loop Principal
-    public void iniciarBatalha() {
+    public boolean iniciarBatalha() {
         Pokemon pokemonAliado = jogador.getPokemon();
 
         if (pokemonAliado == null) {
             System.out.println("Erro: Jogador não possui Pokémon para batalhar.");
-            return;
         }
 
         System.out.println("Um " + pokemonAdversario.getNome() + " selvagem apareceu!");
@@ -87,8 +84,9 @@ public class Batalha {
                     break;
             }
         }
-        encerrarBatalha(pokemonAliado, pokemonAdversario);
+        return encerrarBatalha(pokemonAliado, pokemonAdversario);
     }
+
     private void executarAtaques(Pokemon aliado, Pokemon adversario) {
         if (obterVelocidade(aliado) >= obterVelocidade(adversario)) {
             boolean morreu = menuAtaque(aliado, adversario);
@@ -102,6 +100,7 @@ public class Batalha {
             }
         }
     }
+
     private boolean menuAtaque(Pokemon atacante, Pokemon defensor) {
         List<Movimento> movimentos = obterMovimentosLimitados(atacante);
         if (movimentos.isEmpty()) {
@@ -152,6 +151,7 @@ public class Batalha {
         Movimento movAdversario = movimentos.get(indexAleatorio);
         realizarAtaque(atacante, defensor, movAdversario);
     }
+
     private void realizarAtaque(Pokemon atacante, Pokemon defensor, Movimento movimento) {
         if (movimento == null) return;
 
@@ -226,12 +226,15 @@ public class Batalha {
         return chance > 50;
     }
 
-    private void encerrarBatalha(Pokemon aliado, Pokemon adversario) {
+    private boolean encerrarBatalha(Pokemon aliado, Pokemon adversario) {
         System.out.println("\n--- FIM DE BATALHA ---");
         if (aliado != null && aliado.getVida() <= 0) {
             System.out.println("Seu Pokémon desmaiou. Você perdeu!");
+            return false;
         } else if (adversario != null && adversario.getVida() <= 0) {
             System.out.println("O " + adversario.getNome() + " selvagem desmaiou. Você venceu!");
+            return true;
         }
+        return false;
     }
 }

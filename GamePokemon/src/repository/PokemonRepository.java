@@ -91,7 +91,6 @@ public class PokemonRepository {
     }
 
     public void salvar(Pokemon pokemon) throws SQLException {
-        System.out.println("Salvando " + pokemon.getNome());
         try (Connection conn = DatabaseConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
@@ -217,7 +216,7 @@ public class PokemonRepository {
 
     public void popular() throws Exception {
         System.out.println("Buscando lista de pokémons...");
-        String json = api.get("pokemon?limit=151");
+        String json = api.get("pokemon?limit=150");
 
         JsonArray results = JsonParser.parseString(json)
                 .getAsJsonObject()
@@ -242,27 +241,10 @@ public class PokemonRepository {
     }
 
     public Pokemon buscarPorId(int id) throws SQLException {
-        String sql = "SELECT id, nome, vida, nivel, tipos FROM pokemon WHERE id = ?";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                List<Tipo> tipos = stringParaTipos(rs.getString("tipos"));
-                return new Pokemon(
-                        rs.getInt("id"),
-                        rs.getString("nome"),
-                        tipos,
-                        rs.getInt("vida"),
-                        rs.getInt("nivel"),
-                        new ArrayList<>()
-                );
-            }
-            return null;
-        }
+        return buscarTodos().stream()
+                .filter(p -> p.getId() == id)
+                .findFirst()
+                .orElse(null);
     }
 
     public List<Pokemon> buscarAleatorios() throws SQLException {
