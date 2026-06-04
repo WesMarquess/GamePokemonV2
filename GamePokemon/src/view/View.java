@@ -1,10 +1,12 @@
 package view;
 
 import battle.Batalha;
+
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
+
 import model.Jogador;
 import model.Pokemon;
 import repository.JogadorRepository;
@@ -12,8 +14,6 @@ import repository.PokemonRepository;
 import service.JogadorService;
 
 public class View {
-
-    public static final String quebraLinha = "\n";
     public static Jogador jogador;
     private PokemonRepository pokemonRepository;
     private JogadorService jogadorService;
@@ -61,24 +61,113 @@ public class View {
         List<Pokemon> opcoes = pokemonRepository.buscarAleatorios();
         Pokemon escolhido = exibirEscolhaPokemon(input, opcoes);
         jogador = cadastrarJogador(input, escolhido);
-        Pokemon adversario = escolherAdversarioTeste(escolhido, opcoes);
-        iniciarBatalhaTeste(adversario);
+
+        boolean continuarJogando = true;
+        while (continuarJogando) {
+            List<Pokemon> novasOpcoes = pokemonRepository.buscarAleatorios();
+            Pokemon adversario = escolherAdversarioTeste(escolhido, novasOpcoes);
+            boolean venceu = iniciarBatalhaTeste(adversario, input);
+
+            if (!venceu) {
+                System.out.println("Fim de jogo!");
+                break;
+            }
+
+            boolean respostaValida = false;
+            while (!respostaValida) {
+                System.out.println("\nDeseja continuar jogando? (1 - Sim / 2 - Não)");
+                String resposta = input.nextLine().trim();
+                if (resposta.equals("1")) {
+                    respostaValida = true;
+
+                    boolean salvarValido = false;
+                    while (!salvarValido) {
+                        System.out.println("Deseja salvar o progresso? (1 - Sim / 2 - Não)");
+                        String salvar = input.nextLine().trim();
+                        if (salvar.equals("1")) {
+                            salvarProgresso();
+                            salvarValido = true;
+                        } else if (salvar.equals("2")) {
+                            salvarValido = true;
+                        } else {
+                            System.out.println("Opcao invalida! Digite 1 para Sim ou 2 para Nao.");
+                        }
+                    }
+                } else if (resposta.equals("2")) {
+                    continuarJogando = false;
+                    respostaValida = true;
+                } else {
+                    System.out.println("Opcao invalida! Digite 1 para Sim ou 2 para Nao.");
+                }
+            }
+        }
     }
 
-    private void carregarJogo(Scanner input) {
+    private void carregarJogo(Scanner input) throws Exception {
         System.out.print("Digite seu ID de jogador: ");
         try {
             int id = Integer.parseInt(input.nextLine().trim());
             JogadorRepository jogadorRepository = new JogadorRepository();
             jogador = jogadorRepository.buscarPorId(id);
+
             if (jogador == null) {
                 System.out.println("Jogador nao encontrado.");
-            } else {
-                jogadorService = new JogadorService(jogador);
-                System.out.println("Bem vindo de volta, " + jogador.getNome() + "!");
+                return;
             }
+
+            jogadorService = new JogadorService(jogador);
+            System.out.println("Bem vindo de volta, " + jogador.getNome() + "!");
+            System.out.println("Pokemon: " + jogador.getPokemon().getNome() +
+                    " | HP: " + jogador.getPokemon().getVida() +
+                    "/" + jogador.getPokemon().getVidaMaxima());
+
+            menuJogoContinuado(input);
+
+        } catch (NumberFormatException e) {
+            System.out.println("Digite um numero valido.");
         } catch (Exception e) {
             System.out.println("Erro ao carregar jogo: " + e.getMessage());
+        }
+    }
+
+    private void menuJogoContinuado(Scanner input) throws SQLException {
+        String menu = """
+                +--------------------------------+
+                |         O QUE DESEJA?          |
+                +--------------------------------+
+                |  1 - Batalhar                  |
+                |  2 - Salvar progresso          |
+                |  3 - Voltar ao menu principal  |
+                +--------------------------------+
+                """;
+
+        int opcao = 0;
+        while (opcao != 3) {
+            System.out.println(menu);
+            System.out.print("Escolha: ");
+            try {
+                opcao = Integer.parseInt(input.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Digite um numero valido.");
+                continue;
+            }
+
+            switch (opcao) {
+                case 1 -> {
+                    List<Pokemon> opcoes = pokemonRepository.buscarAleatorios();
+                    Pokemon adversario = escolherAdversarioTeste(jogador.getPokemon(), opcoes);
+                    boolean venceu = iniciarBatalhaTeste(adversario, input);
+                    if (!venceu) {
+                        System.out.println("Fim de jogo!");
+                        return;
+                    }
+                    System.out.println("Deseja salvar o progresso? (1 - Sim / 2 - Não)");
+                    if (input.nextLine().trim().equals("1")) salvarProgresso();
+                }
+                case 2 -> salvarProgresso();
+                case 3 -> System.out.println("Voltando ao menu principal...");
+                default -> System.out.println("Opcao invalida.");
+            }
         }
     }
 
@@ -86,7 +175,6 @@ public class View {
         String nomeJogador;
 
         while (true) {
-            System.out.println(quebraLinha);
             System.out.println("Insira seu nome de jogador:");
             nomeJogador = input.nextLine().trim();
 
@@ -96,7 +184,12 @@ public class View {
             System.out.println("Nome inválido! Digite pelo menos 3 letras.");
         }
 
-        Jogador novoJogador = new Jogador(null, nomeJogador, pokemonEscolhido, 5);
+        Jogador novoJogador = new Jogador(null, nomeJogador);
+
+        if (pokemonEscolhido != null) {
+            novoJogador.adicionarPokemon(pokemonEscolhido);
+        }
+
         jogadorService = new JogadorService(novoJogador);
         jogadorService.cadastrar(novoJogador);
         return novoJogador;
@@ -141,10 +234,11 @@ public class View {
         return escolhido;
     }
 
-    private void iniciarBatalhaTeste(Pokemon adversario) {
-        System.out.println("\nPreparando batalha de teste contra " + adversario.getNome() + "...");
-        Batalha batalha = new Batalha(jogador, adversario);
-        batalha.iniciarBatalha();
+    private boolean iniciarBatalhaTeste(Pokemon adversario, Scanner input) {
+        adversario.setVida(adversario.getVidaMaxima());
+        System.out.println("Adversario: " + adversario.getNome());
+        Batalha batalha = new Batalha(jogador, adversario, input);
+        return batalha.iniciarBatalha();
     }
 
     public void salvarProgresso() {
@@ -157,31 +251,21 @@ public class View {
 
     public StringBuilder historia() {
         StringBuilder sb = new StringBuilder();
-        sb.append(quebraLinha);
-        sb.append("Parabens! Voce foi escolhido para ser um Mestre Pokemon!");
-        sb.append(quebraLinha);
-        sb.append("Pokemons sao criaturas fofas mas que podem ser muito poderosas.");
-        sb.append(quebraLinha);
-        sb.append("Agora chegou sua hora. Escolha seu primeiro monstrinho!");
-        sb.append(quebraLinha);
+        sb.append("\nParabens! Voce foi escolhido para ser um Mestre Pokemon!");
+        sb.append("\nPokemons sao criaturas fofas mas que podem ser muito poderosas.");
+        sb.append("\nAgora chegou sua hora. Escolha seu primeiro monstrinho!");
         System.out.println(sb);
         return sb;
     }
 
     public StringBuilder creditos() {
         StringBuilder sb = new StringBuilder();
-        sb.append(quebraLinha);
-        sb.append("Desenvolvedores:");
-        sb.append(quebraLinha);
-        sb.append("  Daniel Alves de Souza");
-        sb.append(quebraLinha);
-        sb.append("  Pablo Eduardo de Sousa Fernandes");
-        sb.append(quebraLinha);
-        sb.append("  Pedro Henrique de Paula");
-        sb.append(quebraLinha);
-        sb.append("  Weslley Lima Marques da Silva");
-        sb.append(quebraLinha);
-        sb.append("Se divirta ao jogar!");
+        sb.append("\nDesenvolvedores:");
+        sb.append("\nDaniel Alves de Souza");
+        sb.append("\nPablo Eduardo de Sousa Fernandes");
+        sb.append("\nPedro Henrique de Paula");
+        sb.append("\nWeslley Lima Marques da Silva");
+        sb.append("\nSe divirta ao jogar!");
         System.out.println(sb);
         return sb;
     }

@@ -1,6 +1,8 @@
 package repository;
 
 import connection.DatabaseConnection;
+import enums.TipoItem;
+import model.Item;
 import model.Jogador;
 import model.Pokemon;
 
@@ -18,8 +20,8 @@ public class JogadorRepository {
 
     private void inserir(Jogador jogador) throws SQLException {
         String sql = """
-                    INSERT INTO jogador (nome, pokemon_id, vida_atual, nivel_atual, pocoes)
-                    VALUES (?, ?, ?, ?, ?)
+                    INSERT INTO jogador (nome, pokemon_id, vida_atual, nivel_atual, qtd_pocao, qtd_pokebola, qtd_reviver)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
                 """;
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -28,7 +30,9 @@ public class JogadorRepository {
             stmt.setInt(2, jogador.getPokemon().getId());
             stmt.setInt(3, jogador.getPokemon().getVida());
             stmt.setInt(4, jogador.getPokemon().getNivel());
-            stmt.setInt(5, jogador.getPocao());
+            stmt.setInt(5, quantidadeItem(jogador, TipoItem.POCAO));
+            stmt.setInt(6, quantidadeItem(jogador, TipoItem.POKEBOLA));
+            stmt.setInt(7, quantidadeItem(jogador, TipoItem.REVIVER));
             stmt.executeUpdate();
 
             ResultSet rs = stmt.getGeneratedKeys();
@@ -40,7 +44,8 @@ public class JogadorRepository {
 
     private void atualizar(Jogador jogador) throws SQLException {
         String sql = """
-                    UPDATE jogador SET nome = ?, pokemon_id = ?, vida_atual = ?, nivel_atual = ?, pocoes = ?
+                    UPDATE jogador SET nome = ?, pokemon_id = ?, vida_atual = ?, nivel_atual = ?,
+                    qtd_pocao = ?, qtd_pokebola = ?, qtd_reviver = ?
                     WHERE id = ?
                 """;
         try (Connection conn = DatabaseConnection.getConnection();
@@ -50,15 +55,26 @@ public class JogadorRepository {
             stmt.setInt(2, jogador.getPokemon().getId());
             stmt.setInt(3, jogador.getPokemon().getVida());
             stmt.setInt(4, jogador.getPokemon().getNivel());
-            stmt.setInt(5, jogador.getPocao());
-            stmt.setInt(6, jogador.getId());
+            stmt.setInt(5, quantidadeItem(jogador, TipoItem.POCAO));
+            stmt.setInt(6, quantidadeItem(jogador, TipoItem.POKEBOLA));
+            stmt.setInt(7, quantidadeItem(jogador, TipoItem.REVIVER));
+            stmt.setInt(8, jogador.getId());
             stmt.executeUpdate();
         }
     }
 
+    private int quantidadeItem(Jogador jogador, TipoItem tipo) {
+        return jogador.getItens().stream()
+                .filter(i -> i.getTipo() == tipo)
+                .map(Item::getQuantidade)
+                .findFirst()
+                .orElse(0);
+    }
+
     public Jogador buscarPorId(int id) throws SQLException {
         String sql = """
-                    SELECT j.id, j.nome, j.pocoes, j.vida_atual, j.nivel_atual, j.pokemon_id
+                    SELECT j.id, j.nome, j.vida_atual, j.nivel_atual, j.pokemon_id,
+                           j.qtd_pocao, j.qtd_pokebola, j.qtd_reviver
                     FROM jogador j
                     WHERE j.id = ?
                 """;
@@ -75,12 +91,13 @@ public class JogadorRepository {
                 pokemon.setVida(rs.getInt("vida_atual"));
                 pokemon.setNivel(rs.getInt("nivel_atual"));
 
-                return new Jogador(
-                        rs.getInt("id"),
-                        rs.getString("nome"),
-                        pokemon,
-                        rs.getInt("pocoes")
-                );
+                Jogador jogador = new Jogador(rs.getInt("id"), rs.getString("nome"));
+                jogador.adicionarPokemon(pokemon);
+                jogador.setQuantidadeItem(TipoItem.POCAO, rs.getInt("qtd_pocao"));
+                jogador.setQuantidadeItem(TipoItem.POKEBOLA, rs.getInt("qtd_pokebola"));
+                jogador.setQuantidadeItem(TipoItem.REVIVER, rs.getInt("qtd_reviver"));
+
+                return jogador;
             }
             return null;
         }

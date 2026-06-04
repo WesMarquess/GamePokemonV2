@@ -10,7 +10,7 @@ public enum Tipo {
     PEDRA,
     PSIQUICO,
     FANTASMA,
-    VENENO,
+    VENENOSO,
     INSETO,
     GELO,
     LUTADOR,
