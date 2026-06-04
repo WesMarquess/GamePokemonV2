@@ -105,7 +105,7 @@ public class PokemonParser {
             case "rock" -> Tipo.PEDRA;
             case "psychic" -> Tipo.PSIQUICO;
             case "ghost" -> Tipo.FANTASMA;
-            case "poison" -> Tipo.VENENO;
+            case "poison" -> Tipo.VENENOSO;
             case "bug" -> Tipo.INSETO;
             case "ice" -> Tipo.GELO;
             case "fighting" -> Tipo.LUTADOR;

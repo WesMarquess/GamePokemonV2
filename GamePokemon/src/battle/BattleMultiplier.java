@@ -11,7 +11,6 @@ public class BattleMultiplier {
             new HashMap<>();
 
     static {
-
         for (Tipo attacker : Tipo.values()) {
             chart.put(attacker, new HashMap<>());
         }
@@ -39,7 +38,7 @@ public class BattleMultiplier {
         chart.get(Tipo.PLANTA).put(Tipo.FOGO, 0.5);
         chart.get(Tipo.PLANTA).put(Tipo.INSETO, 0.5);
         chart.get(Tipo.PLANTA).put(Tipo.VOADOR, 0.5);
-        chart.get(Tipo.PLANTA).put(Tipo.VENENO, 0.5);
+        chart.get(Tipo.PLANTA).put(Tipo.VENENOSO, 0.5);
         chart.get(Tipo.PLANTA).put(Tipo.PLANTA, 1.0);
 
         // ELETRICO
@@ -76,7 +75,7 @@ public class BattleMultiplier {
         // TERRA
         chart.get(Tipo.TERRA).put(Tipo.FOGO, 2.0);
         chart.get(Tipo.TERRA).put(Tipo.ELETRICO, 2.0);
-        chart.get(Tipo.TERRA).put(Tipo.VENENO, 2.0);
+        chart.get(Tipo.TERRA).put(Tipo.VENENOSO, 2.0);
         chart.get(Tipo.TERRA).put(Tipo.PEDRA, 2.0);
         chart.get(Tipo.TERRA).put(Tipo.PLANTA, 0.5);
         chart.get(Tipo.TERRA).put(Tipo.GELO, 0.5);
@@ -90,6 +89,9 @@ public class BattleMultiplier {
     }
 
     public static double getMultiplier(Tipo attacker, Tipo defender) {
+        if (attacker == null || defender == null) {
+            return 1.0;
+        }
 
         Map<Tipo, Double> inner = chart.get(attacker);
 

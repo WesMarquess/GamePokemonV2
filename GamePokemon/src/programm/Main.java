@@ -4,7 +4,6 @@ import view.View;
 
 import java.util.Scanner;
 
-
 public class Main {
     static Scanner input = new Scanner(System.in);
 
@@ -12,5 +11,6 @@ public class Main {
         View view = new View();
 
         view.menu(input);
+
     }
 }

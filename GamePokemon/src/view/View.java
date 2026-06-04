@@ -1,10 +1,12 @@
 package view;
 
 import battle.Batalha;
+
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
+
 import model.Jogador;
 import model.Pokemon;
 import repository.JogadorRepository;
@@ -82,6 +84,7 @@ public class View {
         }
     }
 
+    // CADastrar jogador
     public Jogador cadastrarJogador(Scanner input, Pokemon pokemonEscolhido) {
         String nomeJogador;
 
@@ -96,7 +99,12 @@ public class View {
             System.out.println("Nome inválido! Digite pelo menos 3 letras.");
         }
 
-        Jogador novoJogador = new Jogador(null, nomeJogador, pokemonEscolhido, 5);
+        Jogador novoJogador = new Jogador(null, nomeJogador);
+
+        if (pokemonEscolhido != null) {
+            novoJogador.adicionarPokemon(pokemonEscolhido);
+        }
+
         jogadorService = new JogadorService(novoJogador);
         jogadorService.cadastrar(novoJogador);
         return novoJogador;
@@ -142,7 +150,8 @@ public class View {
     }
 
     private void iniciarBatalhaTeste(Pokemon adversario) {
-        System.out.println("\nPreparando batalha de teste contra " + adversario.getNome() + "...");
+        System.out.println("Adversario: " + adversario.getNome());
+        System.out.println("Movimentos: " + adversario.getMovimentos().size());
         Batalha batalha = new Batalha(jogador, adversario);
         batalha.iniciarBatalha();
     }
