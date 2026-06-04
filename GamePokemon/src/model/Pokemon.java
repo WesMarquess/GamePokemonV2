@@ -10,6 +10,8 @@ public class Pokemon {
     private Integer id;
     private String nome;
     private List<Tipo> tipos;
+
+    // vida atual
     private Integer vida;
     private Integer vidaMaxima;
     private Integer nivel;
@@ -47,6 +49,10 @@ public class Pokemon {
         this.tipos = new ArrayList<>(tipos);
         this.vidaMaxima = vida;
         this.vida = vida;
+
+        // ao criar o pokemon, a vida máxima será a vida inicial
+        this.vidaMaxima = vida;
+
         this.nivel = nivel;
 
         this.movimentos = new ArrayList<>();
@@ -128,6 +134,10 @@ public class Pokemon {
             return;
         }
         movimentos.add(movimento);
+    }
+
+    public boolean estaDesmaiado() {
+        return vida <= 0;
     }
 
     public boolean estaDesmaiado() {
