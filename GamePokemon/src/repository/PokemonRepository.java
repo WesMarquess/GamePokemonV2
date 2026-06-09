@@ -40,7 +40,8 @@ public class PokemonRepository {
                             nome    VARCHAR(100) NOT NULL,
                             vida    INTEGER NOT NULL,
                             nivel   INTEGER NOT NULL,
-                            tipos   VARCHAR(100) NOT NULL
+                            tipos   VARCHAR(100) NOT NULL,
+                             evolucao_id INTEGER
                         )
                     """);
 
@@ -76,6 +77,7 @@ public class PokemonRepository {
                             qtd_pocao     INTEGER NOT NULL,
                             qtd_pokebola  INTEGER NOT NULL,
                             qtd_reviver   INTEGER NOT NULL,
+                            xp_atual INTEGER NOT NULL DEFAULT 0,
                             FOREIGN KEY (pokemon_id) REFERENCES pokemon(id)
                             )
                     """);

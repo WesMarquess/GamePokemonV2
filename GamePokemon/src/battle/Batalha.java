@@ -195,9 +195,9 @@ public class Batalha {
     }
 
     private int obterAtaque(Pokemon pokemon) {
-        if (pokemon == null) return 10;
+        if (pokemon == null) return 5;
         Integer nivel = pokemon.getNivel();
-        return 10 + (nivel != null ? nivel : 1) * 2;
+        return 5 + (nivel != null ? nivel : 1) * 2;
     }
 
     private int obterDefesa(Pokemon pokemon) {
@@ -233,6 +233,8 @@ public class Batalha {
             return false;
         } else if (adversario != null && adversario.getVida() <= 0) {
             System.out.println("O " + adversario.getNome() + " selvagem desmaiou. Você venceu!");
+            int xpGanho = adversario.getNivel() * 50;
+            aliado.ganharXp(xpGanho);
             return true;
         }
         return false;

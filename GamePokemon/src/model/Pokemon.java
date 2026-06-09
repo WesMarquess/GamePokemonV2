@@ -10,11 +10,10 @@ public class Pokemon {
     private Integer id;
     private String nome;
     private List<Tipo> tipos;
-
-    // vida atual
     private Integer vida;
     private Integer vidaMaxima;
     private Integer nivel;
+    private Integer xp = 0;
     private List<Movimento> movimentos;
 
     public Pokemon(
@@ -49,8 +48,6 @@ public class Pokemon {
         this.tipos = new ArrayList<>(tipos);
         this.vidaMaxima = vida;
         this.vida = vida;
-
-        // ao criar o pokemon, a vida máxima será a vida inicial
         this.vidaMaxima = vida;
 
         this.nivel = nivel;
@@ -79,6 +76,14 @@ public class Pokemon {
 
     public Integer getVida() {
         return vida;
+    }
+
+    public Integer getXp() {
+        return xp;
+    }
+
+    public void setXp(Integer xp) {
+        this.xp = xp;
     }
 
     public void setVida(Integer vida) {
@@ -138,6 +143,21 @@ public class Pokemon {
 
     public boolean estaDesmaiado() {
         return vida <= 0;
+    }
+
+    public void ganharXp(int quantidade) {
+        this.xp += quantidade;
+        System.out.println(nome + " ganhou " + quantidade + " XP!");
+
+        while (xp >= nivel * 100) {
+            xp -= nivel * 100;
+            subirNivel();
+        }
+    }
+
+    private void subirNivel() {
+        this.nivel++;
+        System.out.println(nome + " subiu para o nível " + nivel + "!");
     }
 
     @Override

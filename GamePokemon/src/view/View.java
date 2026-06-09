@@ -65,8 +65,8 @@ public class View {
         boolean continuarJogando = true;
         while (continuarJogando) {
             List<Pokemon> novasOpcoes = pokemonRepository.buscarAleatorios();
-            Pokemon adversario = escolherAdversarioTeste(escolhido, novasOpcoes);
-            boolean venceu = iniciarBatalhaTeste(adversario, input);
+            Pokemon adversario = escolherAdversario(escolhido, novasOpcoes);
+            boolean venceu = iniciarBatalha(adversario, input);
 
             if (!venceu) {
                 System.out.println("Fim de jogo!");
@@ -155,8 +155,8 @@ public class View {
             switch (opcao) {
                 case 1 -> {
                     List<Pokemon> opcoes = pokemonRepository.buscarAleatorios();
-                    Pokemon adversario = escolherAdversarioTeste(jogador.getPokemon(), opcoes);
-                    boolean venceu = iniciarBatalhaTeste(adversario, input);
+                    Pokemon adversario = escolherAdversario(jogador.getPokemon(), opcoes);
+                    boolean venceu = iniciarBatalha(adversario, input);
                     if (!venceu) {
                         System.out.println("Fim de jogo!");
                         return;
@@ -225,7 +225,7 @@ public class View {
         return opcoes.get(escolha - 1);
     }
 
-    private Pokemon escolherAdversarioTeste(Pokemon escolhido, List<Pokemon> opcoes) {
+    private Pokemon escolherAdversario(Pokemon escolhido, List<Pokemon> opcoes) {
         for (Pokemon pokemon : opcoes) {
             if (!pokemon.equals(escolhido)) {
                 return pokemon;
@@ -234,7 +234,7 @@ public class View {
         return escolhido;
     }
 
-    private boolean iniciarBatalhaTeste(Pokemon adversario, Scanner input) {
+    private boolean iniciarBatalha(Pokemon adversario, Scanner input) {
         adversario.setVida(adversario.getVidaMaxima());
         System.out.println("Adversario: " + adversario.getNome());
         Batalha batalha = new Batalha(jogador, adversario, input);
