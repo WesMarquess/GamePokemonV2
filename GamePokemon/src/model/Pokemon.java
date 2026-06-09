@@ -140,10 +140,6 @@ public class Pokemon {
         return vida <= 0;
     }
 
-    public boolean estaDesmaiado() {
-        return vida <= 0;
-    }
-
     @Override
     public String toString() {
         if (tipos == null) return nome + " | Sem tipos";

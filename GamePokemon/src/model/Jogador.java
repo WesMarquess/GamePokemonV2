@@ -56,7 +56,7 @@ public class Jogador {
             return false;
         }
 
-        pokemon.setVida(pokemon.getVida() + 20);
+        pokemon.setVida(pokemon.getVida() + 50);
         pocao.diminuirQuantidade();
 
         System.out.println(pokemon.getNome() + " recuperou de vida! Vida atual: " + pokemon.getVida() + "/" + pokemon.getVidaMaxima());
