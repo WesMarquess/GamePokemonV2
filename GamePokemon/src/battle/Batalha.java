@@ -205,9 +205,12 @@ public class Batalha {
     }
 
     private int obterAtaque(Pokemon pokemon) {
-        if (pokemon == null) return 5;
+        if (pokemon == null){
+            return 5;
+        }
+
         Integer nivel = pokemon.getNivel();
-        return 5 + (nivel != null ? nivel : 1) * 2;
+        return 7 + (nivel != null ? nivel : 1) * 2;
     }
 
     private int obterDefesa(Pokemon pokemon) {
@@ -223,12 +226,27 @@ public class Batalha {
     }
 
     private List<Movimento> obterMovimentosLimitados(Pokemon pokemon) {
-        if (pokemon == null) return List.of();
+        if (pokemon == null) {
+            return List.of();
+        }
+
         List<Movimento> movimentos = pokemon.getMovimentos();
         if (movimentos == null || movimentos.isEmpty()) {
             return List.of();
         }
-        return movimentos.size() <= 4 ? movimentos : movimentos.subList(0, 4);
+
+        int nivel = pokemon.getNivel();
+        int limite;
+
+        if (nivel >= 6) {
+            limite = 4;
+        } else if (nivel >= 3) {
+            limite = 3;
+        } else {
+            limite = 2;
+        }
+
+        return movimentos.subList(0, Math.min(limite, movimentos.size()));
     }
 
     private boolean tentarFugir() {

@@ -169,11 +169,19 @@ public class Pokemon {
     private void subirNivel() {
         this.nivel++;
         System.out.println(nome + " subiu para o nível " + nivel + "!");
+
+        if (nivel == 3) {
+            System.out.println(nome + " Novo golpe aprendido");
+        } else if (nivel == 6) {
+            System.out.println(nome + " Novo golpe aprendido");
+        }
     }
 
     @Override
     public String toString() {
-        if (tipos == null) return nome + " | Sem tipos";
+        if (tipos == null){
+            return nome + " | Sem tipos";
+        }
 
         String tiposFormatados = tipos.stream()
                 .map(Tipo::name)

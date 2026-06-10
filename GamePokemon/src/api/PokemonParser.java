@@ -113,7 +113,6 @@ public class PokemonParser {
             if (proximasEvolucoes.size() > 0) {
                 JsonObject proxima = proximasEvolucoes.get(0).getAsJsonObject();
                 String urlProxima = proxima.getAsJsonObject("species").get("url").getAsString();
-                // A URL da species tem o ID no final no /pokemon-species/2/
                 String[] partes = urlProxima.split("/");
                 return Integer.parseInt(partes[partes.length - 1]);
             }
