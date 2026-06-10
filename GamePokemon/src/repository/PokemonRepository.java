@@ -273,7 +273,7 @@ public class PokemonRepository {
                 System.out.println("Erro ao salvar " + nome + ": " + e.getMessage());
             }
         }
-        System.out.println("Concluído!");
+        System.out.println("Concluído! Para jogar reinicie o Main novamente.");
     }
 
     public Pokemon buscarPorId(int id) throws SQLException {

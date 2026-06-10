@@ -181,8 +181,13 @@ public class Batalha {
 
         double multiplicador = BattleMultiplier.getMultiplier(movimento.getTipo(), obterTipo(defensor));
 
-        if (multiplicador > 1.0) System.out.println("Foi super efetivo!");
-        if (multiplicador < 1.0 && multiplicador > 0) System.out.println("Não foi muito efetivo...");
+        if (multiplicador > 1.0) {
+            System.out.println("Foi super efetivo!");
+        }
+
+        if (multiplicador < 1.0 && multiplicador > 0) {
+            System.out.println("Não foi muito efetivo...");
+        }
         if (multiplicador == 0) {
             System.out.println("Não teve efeito nenhum!");
             return;
@@ -205,7 +210,7 @@ public class Batalha {
     }
 
     private int obterAtaque(Pokemon pokemon) {
-        if (pokemon == null){
+        if (pokemon == null) {
             return 5;
         }
 
