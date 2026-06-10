@@ -2,6 +2,7 @@ package battle;
 
 import enums.Tipo;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
@@ -9,20 +10,23 @@ import java.util.Scanner;
 import model.Jogador;
 import model.Movimento;
 import model.Pokemon;
+import repository.PokemonRepository;
 
 public class Batalha {
     private Jogador jogador;
     private Pokemon pokemonAdversario;
+    private PokemonRepository repository;
     private Scanner scanner;
     private Random random;
 
-    public Batalha(Jogador jogador, Pokemon pokemonAdversario, Scanner scanner) {
+    public Batalha(Jogador jogador, Pokemon pokemonAdversario, Scanner scanner, PokemonRepository repository) {
         if (jogador == null) throw new IllegalArgumentException("O jogador não pode ser nulo.");
         if (pokemonAdversario == null) throw new IllegalArgumentException("O adversário não pode ser nulo.");
         this.jogador = jogador;
         this.pokemonAdversario = pokemonAdversario;
         this.scanner = scanner;
         this.random = new Random();
+        this.repository = repository;
     }
 
     // O Loop Principal
@@ -111,7 +115,13 @@ public class Batalha {
         System.out.println("\nEscolha um movimento:");
         for (int i = 0; i < movimentos.size(); i++) {
             Movimento mov = movimentos.get(i);
-            System.out.println((i + 1) + ". " + mov.getNome() + " (PP: " + mov.getPpAtual() + ")");
+            System.out.printf("%d. %s | PP: %d/%d | Tipo: %s | Precisão: %d%%%n",
+                    i + 1,
+                    mov.getNome(),
+                    mov.getPpAtual(),
+                    mov.getPpMaximo(),
+                    mov.getTipo(),
+                    mov.getPrecisao());
         }
         System.out.print("Escolha: ");
 
@@ -235,6 +245,19 @@ public class Batalha {
             System.out.println("O " + adversario.getNome() + " selvagem desmaiou. Você venceu!");
             int xpGanho = adversario.getNivel() * 50;
             aliado.ganharXp(xpGanho);
+
+            if (aliado.getEvolucaoId() != null && aliado.getNivel() % 3 == 0) {
+                try {
+                    Pokemon evoluido = repository.buscarPorId(aliado.getEvolucaoId());
+                    if (evoluido != null) {
+                        System.out.println(aliado.getNome() + " evoluiu para " + evoluido.getNome());
+                        jogador.substituirPokemon(evoluido);
+                    }
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+
             return true;
         }
         return false;

@@ -40,8 +40,12 @@ public class PokemonApi {
         return get("pokemon/" + id);
     }
 
-    public String buscarEvolucao(int id) throws Exception {
-        return get("evolution-chain/" + id);
+    public String buscarSpecies(int id) throws Exception {
+        return get("pokemon-species/" + id);
+    }
+
+    public String buscarEvolucaoChain(String url) throws Exception {
+        return getUrl(url);
     }
 
     public String buscarAtaque(String nomeAtaque) throws Exception {

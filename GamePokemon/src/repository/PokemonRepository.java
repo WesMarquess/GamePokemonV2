@@ -89,6 +89,34 @@ public class PokemonRepository {
         if (buscarTodos().isEmpty()) {
             System.out.println("Primeira execucao! Carregando dados...");
             popular();
+            popularEvolucoes();
+        }
+    }
+
+    public void popularEvolucoes() throws Exception {
+        List<Pokemon> todos = buscarTodos();
+        for (Pokemon pokemon : todos) {
+            try {
+                String speciesJson = api.buscarSpecies(pokemon.getId());
+                Integer evolucaoId = parser.parsearEvolucaoId(speciesJson, pokemon.getNome());
+                atualizarEvolucao(pokemon.getId(), evolucaoId);
+            } catch (Exception e) {
+                System.out.println("Erro ao buscar evolução de " + pokemon.getNome() + ": " + e.getMessage());
+            }
+        }
+    }
+
+    public void atualizarEvolucao(int pokemonId, Integer evolucaoId) throws SQLException {
+        String sql = "UPDATE pokemon SET evolucao_id = ? WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            if (evolucaoId != null) {
+                stmt.setInt(1, evolucaoId);
+            } else {
+                stmt.setNull(1, java.sql.Types.INTEGER);
+            }
+            stmt.setInt(2, pokemonId);
+            stmt.executeUpdate();
         }
     }
 
@@ -109,7 +137,7 @@ public class PokemonRepository {
         }
     }
 
-    private void salvarPokemon(Connection conn, Pokemon pokemon) throws SQLException {
+    public void salvarPokemon(Connection conn, Pokemon pokemon) throws SQLException {
         String sql = """
                     MERGE INTO pokemon (id, nome, vida, nivel, tipos)
                     KEY(id)
@@ -125,7 +153,7 @@ public class PokemonRepository {
         }
     }
 
-    private int salvarMovimento(Connection conn, Movimento movimento) throws SQLException {
+    public int salvarMovimento(Connection conn, Movimento movimento) throws SQLException {
         String sql = """
                     INSERT INTO movimento (nome, dano, tipo, pp_atual, pp_maximo, precisao)
                     VALUES (?, ?, ?, ?, ?, ?)
@@ -145,7 +173,7 @@ public class PokemonRepository {
         }
     }
 
-    private void vincularMovimento(Connection conn, int pokemonId, int movimentoId) throws SQLException {
+    public void vincularMovimento(Connection conn, int pokemonId, int movimentoId) throws SQLException {
         String sql = "INSERT INTO pokemon_movimento (pokemon_id, movimento_id) VALUES (?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, pokemonId);
@@ -154,7 +182,7 @@ public class PokemonRepository {
         }
     }
 
-    private String tiposParaString(List<Tipo> tipos) {
+    public String tiposParaString(List<Tipo> tipos) {
         return tipos.stream()
                 .map(Tipo::name)
                 .collect(Collectors.joining(","));
@@ -162,7 +190,7 @@ public class PokemonRepository {
 
     public List<Pokemon> buscarTodos() throws SQLException {
         String sql = """
-                    SELECT p.id, p.nome, p.vida, p.nivel, p.tipos,
+                    SELECT p.id, p.nome, p.vida, p.nivel, p.tipos, p.evolucao_id,
                            m.id         AS movimento_id,
                            m.nome       AS movimento_nome,
                            m.dano,
@@ -190,6 +218,12 @@ public class PokemonRepository {
                     Pokemon p = new Pokemon(id, rs.getString("nome"), tipos,
                             rs.getInt("vida"), rs.getInt("nivel"),
                             new ArrayList<>());
+
+                    int evolucaoId = rs.getInt("evolucao_id");
+                    if (!rs.wasNull()) {
+                        p.setEvolucaoId(evolucaoId);
+                    }
+
                     mapa.put(id, p);
                 }
 
@@ -210,7 +244,7 @@ public class PokemonRepository {
         }
     }
 
-    private List<Tipo> stringParaTipos(String tipos) {
+    public List<Tipo> stringParaTipos(String tipos) {
         return Arrays.stream(tipos.split(","))
                 .map(Tipo::valueOf)
                 .collect(Collectors.toList());

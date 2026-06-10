@@ -94,6 +94,41 @@ public class PokemonParser {
         return new Movimento(nome, dano, tipo, pp, pp, precisao);
     }
 
+    public Integer parsearEvolucaoId(String speciesJson, String nomeAtual) throws Exception {
+        JsonObject obj = JsonParser.parseString(speciesJson).getAsJsonObject();
+        String evolucaoChainUrl = obj.getAsJsonObject("evolution_chain").get("url").getAsString();
+
+        String buscaJson = api.getUrl(evolucaoChainUrl);
+        JsonObject chain = JsonParser.parseString(buscaJson).getAsJsonObject();
+
+        return buscarProximaEvolucao(chain.getAsJsonObject("chain"), nomeAtual);
+    }
+
+    private Integer buscarProximaEvolucao(JsonObject chain, String nomeAtual) {
+        String nomeNivel = chain.getAsJsonObject("species").get("name").getAsString();
+
+        JsonArray proximasEvolucoes = chain.getAsJsonArray("evolves_to");
+
+        if (nomeNivel.equalsIgnoreCase(nomeAtual.toLowerCase().replace(" ", "-"))) {
+            if (proximasEvolucoes.size() > 0) {
+                JsonObject proxima = proximasEvolucoes.get(0).getAsJsonObject();
+                String urlProxima = proxima.getAsJsonObject("species").get("url").getAsString();
+                // A URL da species tem o ID no final no /pokemon-species/2/
+                String[] partes = urlProxima.split("/");
+                return Integer.parseInt(partes[partes.length - 1]);
+            }
+            return null;
+        }
+
+        for (JsonElement el : proximasEvolucoes) {
+            Integer resultado = buscarProximaEvolucao(el.getAsJsonObject(), nomeAtual);
+            if (resultado != null) {
+                return resultado;
+            }
+        }
+        return null;
+    }
+
     private Tipo mapearTipo(String tipoApi) {
         return switch (tipoApi) {
             case "normal" -> Tipo.NORMAL;

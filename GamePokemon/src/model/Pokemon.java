@@ -1,6 +1,7 @@
 package model;
 
 import enums.Tipo;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +16,8 @@ public class Pokemon {
     private Integer nivel;
     private Integer xp = 0;
     private List<Movimento> movimentos;
+    private Integer evolucaoId;
+
 
     public Pokemon(
             Integer id,
@@ -84,6 +87,14 @@ public class Pokemon {
 
     public void setXp(Integer xp) {
         this.xp = xp;
+    }
+
+    public Integer getEvolucaoId() {
+        return evolucaoId;
+    }
+
+    public void setEvolucaoId(Integer evolucaoId) {
+        this.evolucaoId = evolucaoId;
     }
 
     public void setVida(Integer vida) {

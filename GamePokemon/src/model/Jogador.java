@@ -153,6 +153,12 @@ public class Jogador {
         }
     }
 
+    public void substituirPokemon(Pokemon novoPokemon) {
+        if (!pokemons.isEmpty()) {
+            pokemons.set(0, novoPokemon);
+        }
+    }
+
     public Integer getId() {
         return id;
     }

@@ -3,6 +3,7 @@ package view;
 import battle.Batalha;
 
 import java.sql.SQLException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -225,19 +226,18 @@ public class View {
         return opcoes.get(escolha - 1);
     }
 
-    private Pokemon escolherAdversario(Pokemon escolhido, List<Pokemon> opcoes) {
-        for (Pokemon pokemon : opcoes) {
-            if (!pokemon.equals(escolhido)) {
-                return pokemon;
-            }
-        }
-        return escolhido;
+    private Pokemon escolherAdversario(Pokemon pokemonJogador, List<Pokemon> opcoes) {
+        int nivelJogador = pokemonJogador.getNivel();
+        return opcoes.stream()
+                .filter(p -> !p.getId().equals(pokemonJogador.getId()))
+                .min(Comparator.comparingInt(p -> Math.abs(p.getNivel() - nivelJogador)))
+                .orElse(opcoes.get(0));
     }
 
     private boolean iniciarBatalha(Pokemon adversario, Scanner input) {
         adversario.setVida(adversario.getVidaMaxima());
         System.out.println("Adversario: " + adversario.getNome());
-        Batalha batalha = new Batalha(jogador, adversario, input);
+        Batalha batalha = new Batalha(jogador, adversario, input,pokemonRepository);
         return batalha.iniciarBatalha();
     }
 
