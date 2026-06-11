@@ -16,7 +16,4 @@ public enum Tipo {
     LUTADOR,
     TERRA,
     DRAGAO
-
-
-
 }

@@ -23,8 +23,8 @@ public class Jogador {
         this.itens = new ArrayList<>();
 
         itens.add(new Item(TipoItem.POKEBOLA, 10));
-        itens.add(new Item(TipoItem.POCAO, 5));
         itens.add(new Item(TipoItem.REVIVER, 2));
+        itens.add(new Item(TipoItem.POCAO, 5));
     }
 
     public void adicionarPokemon(Pokemon pokemon) {
@@ -122,13 +122,14 @@ public class Jogador {
             System.out.println("Você não tem Pokébolas!");
             return false;
         }
-
         pokebola.diminuirQuantidade();
         return true;
     }
 
     private Item buscarItem(TipoItem tipo) {
-        if (tipo == null) return null;
+        if (tipo == null){
+            return null;
+        }
 
         for (Item item : itens) {
             if (item.getTipo() == tipo) {

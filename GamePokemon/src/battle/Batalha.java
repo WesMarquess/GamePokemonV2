@@ -114,14 +114,14 @@ public class Batalha {
 
         System.out.println("\nEscolha um movimento:");
         for (int i = 0; i < movimentos.size(); i++) {
-            Movimento mov = movimentos.get(i);
+            Movimento movimento = movimentos.get(i);
             System.out.printf("%d. %s | PP: %d/%d | Tipo: %s | Precisão: %d%%%n",
                     i + 1,
-                    mov.getNome(),
-                    mov.getPpAtual(),
-                    mov.getPpMaximo(),
-                    mov.getTipo(),
-                    mov.getPrecisao());
+                    movimento.getNome(),
+                    movimento.getPpAtual(),
+                    movimento.getPpMaximo(),
+                    movimento.getTipo(),
+                    movimento.getPrecisao());
         }
         System.out.print("Escolha: ");
 
@@ -144,7 +144,6 @@ public class Batalha {
         } else {
             System.out.println("Movimento inválido! Tropeçou e perdeu a vez.");
         }
-
         return defensor.getVida() <= 0;
     }
 
@@ -211,7 +210,7 @@ public class Batalha {
 
     private int obterAtaque(Pokemon pokemon) {
         if (pokemon == null) {
-            return 5;
+            return 7;
         }
 
         Integer nivel = pokemon.getNivel();
@@ -280,7 +279,6 @@ public class Batalha {
                     System.out.println(e.getMessage());
                 }
             }
-
             return true;
         }
         return false;
